@@ -7,13 +7,16 @@ import {
   Query,
   Redirect,
 } from '@nestjs/common';
+import { CatsService } from './cats.service';
+import { Cat } from './interfaces/cats.interface';
 
 @Controller('cats')
 export class CatsController {
+  constructor(private catsServices: CatsService) {}
   @Get('all')
-  getAllCats(@Ip() ip: string): any {
+  async getAllCats(@Ip() ip: string): Promise<Cat[]> {
     console.log(ip);
-    return [{ a: 3 }];
+    return this.catsServices.findAll();
   }
 
   @Get('ab*cd')
