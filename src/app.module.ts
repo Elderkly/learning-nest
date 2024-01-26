@@ -1,13 +1,25 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CatsController } from './cats/cats.controller';
 import { AdminController } from './admin/admin.controller';
-import { CatsService } from './cats/cats.service';
+import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
-  imports: [],
-  controllers: [AppController, CatsController, AdminController],
-  providers: [AppService, CatsService],
+  imports: [CatsModule],
+  controllers: [AppController, AdminController],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .exclude({ path: 'cats/baidu', method: RequestMethod.ALL })
+      .forRoutes('cats');
+  }
+}
